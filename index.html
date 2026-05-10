@@ -1,14 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>VivanX Racing</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VivanX Racing - Mobile</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="ui">
+        <div id="speed">Speed: 0</div>
+    </div>
 
-<canvas id="game"></canvas>
+    <div id="controls">
+        <button id="leftBtn">L</button>
+        <button id="gasBtn">GAS</button>
+        <button id="rightBtn">R</button>
+    </div>
 
-<script src="main.js"></script>
+    <canvas id="gameCanvas"></canvas>
 
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
