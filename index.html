@@ -2,14 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
-    <title>VivanX Racing Landscape</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VivanX Racing Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="ui">
+    <div id="mainMenu" class="overlay">
+        <h1>VIVANX RACING</h1>
+        <div class="menu-buttons">
+            <button onclick="startGame()">START GAME</button>
+            <button onclick="showOptions()">OPTIONS</button>
+        </div>
+    </div>
+
+    <div id="optionsMenu" class="overlay" style="display: none;">
+        <h2>OPTIONS</h2>
+        <div class="menu-buttons">
+            <button id="musicBtn" onclick="toggleMusic()">MUSIC: ON</button>
+            <button onclick="window.history.back()">EXIT</button>
+            <button onclick="hideOptions()">BACK</button>
+        </div>
+    </div>
+
+    <div id="ui" style="display: none;">
         <div id="score">Coins: 0</div>
-        <button id="backNav" onclick="window.history.back()">← Back</button>
+        <button id="backNav" onclick="location.reload()">← Menu</button>
     </div>
 
     <div id="gameOverScreen" style="display: none;">
@@ -18,7 +35,7 @@
         <button onclick="location.reload()">RESTART</button>
     </div>
 
-    <div id="controls">
+    <div id="controls" style="display: none;">
         <div class="left-side">
             <button id="leftBtn">LEFT</button>
             <button id="rightBtn">RIGHT</button>
@@ -35,5 +52,28 @@
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
     </script>
     <script type="module" src="main.js"></script>
+
+    <script>
+        // Menu Functions
+        function startGame() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('ui').style.display = 'flex';
+            document.getElementById('controls').style.display = 'flex';
+            window.isGameRunning = true; // Game start signal
+        }
+        function showOptions() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('optionsMenu').style.display = 'flex';
+        }
+        function hideOptions() {
+            document.getElementById('optionsMenu').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'flex';
+        }
+        let music = true;
+        function toggleMusic() {
+            music = !music;
+            document.getElementById('musicBtn').innerText = music ? "MUSIC: ON" : "MUSIC: OFF";
+        }
+    </script>
 </body>
 </html>
