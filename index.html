@@ -47,6 +47,35 @@
     </div>
 
     <canvas id="gameCanvas"></canvas>
+    <audio id="bgMusic" loop>
+    <source src="bg_music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    const bgMusic = document.getElementById('bgMusic');
+    
+    // Jaise hi user screen par kahin bhi click karega, music start ho jayega
+    window.addEventListener('click', () => {
+        if (bgMusic.paused && musicPlaying) {
+            bgMusic.play().catch(dist => console.log("Playback failed"));
+        }
+    }, { once: true }); // '{ once: true }' ka matlab hai ye sirf pehle click par chalega
+
+    let musicPlaying = true;
+    
+    function toggleMusic() {
+        musicPlaying = !musicPlaying;
+        if (musicPlaying) {
+            bgMusic.play();
+            document.getElementById('musicBtn').innerText = "MUSIC: ON";
+        } else {
+            bgMusic.pause();
+            document.getElementById('musicBtn').innerText = "MUSIC: OFF";
+        }
+    }
+
+    // Baki ke purane functions (startGame, showOptions, etc.) yahan niche rakhein
+</script>
 
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
