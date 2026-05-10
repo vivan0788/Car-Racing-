@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VivanX Racing - Mobile</title>
+    <title>VivanX Racing Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="ui">
-        <div id="speed">Speed: 0</div>
+        <div id="score">Coins: 0</div>
+        <button id="backBtn" onclick="window.history.back()" style="position: absolute; left: 10px; top: 10px; padding: 5px 10px; background: rgba(255,0,0,0.5); color: white; border: none; border-radius: 5px; z-index: 50;">← Back</button>
+    </div>
+
+    <div id="gameOverScreen" style="display: none;">
+        <h1>CRASHED!</h1>
+        <p id="finalScore">Total Coins: 0</p>
+        <button onclick="location.reload()">RESTART</button>
     </div>
 
     <div id="controls">
