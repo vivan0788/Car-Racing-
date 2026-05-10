@@ -1,73 +1,71 @@
 import * as THREE from 'three';
 
-// 1. Scene & Camera
+// 1. Scene & Setup
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb); 
+scene.background = new THREE.Color(0x111122); // Night City Look
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-// 2. Lights
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-scene.add(ambientLight);
-const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-dirLight.position.set(0, 10, 5);
-scene.add(dirLight);
+// 2. Lighting
+const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambient);
+const sun = new THREE.DirectionalLight(0xffffff, 1);
+sun.position.set(5, 10, 7);
+scene.add(sun);
 
-// 3. Road & Environment
-const trackGeo = new THREE.PlaneGeometry(15, 5000);
-const trackMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-const track = new THREE.Mesh(trackGeo, trackMat);
-track.rotation.x = -Math.PI / 2;
-scene.add(track);
+// 3. The Road (With White Lines)
+const roadGroup = new THREE.Group();
+const roadGeo = new THREE.PlaneGeometry(12, 5000);
+const roadMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+const road = new THREE.Mesh(roadGeo, roadMat);
+road.rotation.x = -Math.PI / 2;
+roadGroup.add(road);
 
-// 4. Advanced Car (Body + Wheels for Animation)
-const carGroup = new THREE.Group();
-const carBody = new THREE.Mesh(
-    new THREE.BoxGeometry(1.2, 0.5, 2.5), 
-    new THREE.MeshStandardMaterial({ color: 0xff0000 })
-);
-carGroup.add(carBody);
+// Center Lines
+for (let i = 0; i < 500; i++) {
+    const lineGeo = new THREE.PlaneGeometry(0.2, 2);
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const line = new THREE.Mesh(lineGeo, lineMat);
+    line.rotation.x = -Math.PI / 2;
+    line.position.set(0, 0.02, -i * 10);
+    roadGroup.add(line);
+}
+scene.add(roadGroup);
 
-// Wheels (Basic)
-const wheelGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.2, 32);
-const wheelMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
-const wheels = [];
-const wheelPositions = [[-0.7, -0.1, 0.8], [0.7, -0.1, 0.8], [-0.7, -0.1, -0.8], [0.7, -0.1, -0.8]];
+// 4. Buildings (City Generation)
+function createCity() {
+    for (let i = 0; i < 100; i++) {
+        const h = Math.random() * 20 + 5;
+        const bGeo = new THREE.BoxGeometry(5, h, 5);
+        const bMat = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+        
+        // Left Buildings
+        const bLeft = new THREE.Mesh(bGeo, bMat);
+        bLeft.position.set(-12, h/2, -i * 30);
+        scene.add(bLeft);
 
-wheelPositions.forEach(pos => {
-    const wheel = new THREE.Mesh(wheelGeo, wheelMat);
-    wheel.rotation.z = Math.PI / 2;
-    wheel.position.set(...pos);
-    carGroup.add(wheel);
-    wheels.push(wheel);
-});
-
-carGroup.position.y = 0.4;
-scene.add(carGroup);
-
-// 5. Coins System
-const coins = [];
-const coinGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32);
-const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 });
-
-function spawnCoins() {
-    for (let i = 0; i < 50; i++) {
-        const coin = new THREE.Mesh(coinGeo, coinMat);
-        coin.rotation.x = Math.PI / 2;
-        coin.position.set((Math.random() - 0.5) * 10, 0.5, -i * 20 - 20);
-        scene.add(coin);
-        coins.push(coin);
+        // Right Buildings
+        const bRight = new THREE.Mesh(bGeo, bMat);
+        bRight.position.set(12, h/2, -i * 30);
+        scene.add(bRight);
     }
 }
-spawnCoins();
+createCity();
 
-// 6. Game State
+// 5. Car Setup
+const carGroup = new THREE.Group();
+const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.6, 2.5), new THREE.MeshStandardMaterial({ color: 0xff0000 }));
+carGroup.add(body);
+carGroup.position.y = 0.3;
+scene.add(carGroup);
+
+// 6. Logic Variables
 let speed = 0;
-let score = 0;
 let isGas = false, isLeft = false, isRight = false;
+const ROAD_LIMIT = 5.3; // Car is raste se bahar nahi jayegi
 
-// Controls
+// Mobile Button Listeners
 const setupBtn = (id, press) => {
     const btn = document.getElementById(id);
     btn.onpointerdown = () => press(true);
@@ -78,46 +76,29 @@ setupBtn('leftBtn', v => isLeft = v);
 setupBtn('rightBtn', v => isRight = v);
 
 function update() {
-    // Speed Logic
-    if (isGas) speed += 0.005;
-    else speed *= 0.98;
+    // Speed & Friction
+    if (isGas) speed += 0.006;
+    else speed *= 0.97;
 
-    // 7. Driving Animation (Leaning Effect)
-    if (isLeft) {
-        carGroup.position.x -= 0.12;
-        carBody.rotation.z = THREE.MathUtils.lerp(carBody.rotation.z, 0.15, 0.1); // Lean left
-        carBody.rotation.y = THREE.MathUtils.lerp(carBody.rotation.y, 0.1, 0.1);  // Turn front
-    } else if (isRight) {
-        carGroup.position.x += 0.12;
-        carBody.rotation.z = THREE.MathUtils.lerp(carBody.rotation.z, -0.15, 0.1); // Lean right
-        carBody.rotation.y = THREE.MathUtils.lerp(carBody.rotation.y, -0.1, 0.1);
+    // 7. STEERING & BOUNDARY (Limit car to road)
+    if (isLeft && carGroup.position.x > -ROAD_LIMIT) {
+        carGroup.position.x -= 0.15;
+        body.rotation.z = 0.1; 
+    } else if (isRight && carGroup.position.x < ROAD_LIMIT) {
+        carGroup.position.x += 0.15;
+        body.rotation.z = -0.1;
     } else {
-        carBody.rotation.z = THREE.MathUtils.lerp(carBody.rotation.z, 0, 0.1);
-        carBody.rotation.y = THREE.MathUtils.lerp(carBody.rotation.y, 0, 0.1);
+        body.rotation.z = 0;
     }
 
-    // Wheel Rotation
-    wheels.forEach(w => w.rotation.x -= speed * 2);
-
+    // Move Car
     carGroup.position.z -= speed;
-    camera.position.set(carGroup.position.x * 0.5, 4, carGroup.position.z + 8);
+
+    // Smooth Camera Follow
+    camera.position.lerp(new THREE.Vector3(carGroup.position.x, 4, carGroup.position.z + 8), 0.1);
     camera.lookAt(carGroup.position);
 
-    // 8. Coin Collection & Rotation
-    coins.forEach((coin, index) => {
-        coin.rotation.y += 0.05; // Spin coin
-        
-        // Distance check (Collision)
-        const dist = carGroup.position.distanceTo(coin.position);
-        if (dist < 1.5) {
-            scene.remove(coin);
-            coins.splice(index, 1);
-            score += 10;
-            document.getElementById('speed').innerText = `Score: ${score} | Speed: ${Math.round(speed * 1000)}`;
-        }
-    });
-
-    if (coins.length === 0) spawnCoins(); // Respawn if all collected
+    document.getElementById('speed').innerText = `Speed: ${Math.round(speed * 1000)}`;
 }
 
 function animate() {
