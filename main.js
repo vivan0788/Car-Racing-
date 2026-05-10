@@ -57,7 +57,8 @@ setup('leftBtn', v => moveL = v); setup('rightBtn', v => moveR = v);
 setup('gasBtn', v => moveG = v); setup('revBtn', v => moveRev = v);
 
 function update() {
-    if (!isLive) return;
+    if (!window.isGameRunning || !isLive) return; // Jab tak Start na dabe, game nahi chalega
+    // ... baki code
 
     // Movement Logic
     if (moveG) speed += 0.008; 
