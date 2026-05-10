@@ -1,26 +1,13 @@
-body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial', sans-serif; user-select: none; }
-#ui { position: absolute; top: 20px; left: 20px; color: white; font-size: 22px; font-weight: bold; z-index: 10; text-shadow: 2px 2px #000; }
+body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; user-select: none; touch-action: none; }
+#ui { position: absolute; top: 20px; width: 100%; text-align: center; color: yellow; font-size: 28px; font-weight: bold; z-index: 10; }
 
-#gameCanvas { width: 100vw; height: 100vh; display: block; }
-
-#controls { 
-    position: absolute; 
-    bottom: 30px; 
-    width: 100%; 
-    display: flex; 
-    justify-content: space-around; 
-    z-index: 20; 
+#gameOverScreen { 
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.9); color: white; padding: 30px; text-align: center;
+    border: 2px solid red; z-index: 100; width: 80%; border-radius: 15px;
 }
+#gameOverScreen button { padding: 15px 30px; font-size: 20px; background: red; color: white; border: none; border-radius: 10px; margin-top: 20px; }
 
-#controls button { 
-    width: 80px; 
-    height: 80px; 
-    background: rgba(255, 255, 255, 0.3); 
-    border: 2px solid white; 
-    border-radius: 50%; 
-    color: white; 
-    font-weight: bold;
-    touch-action: manipulation;
-}
-
-#gasBtn { background: rgba(0, 255, 0, 0.4) !important; width: 100px !important; height: 100px !important; }
+#controls { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: space-around; z-index: 20; }
+#controls button { width: 70px; height: 70px; border-radius: 50%; border: 2px solid white; background: rgba(255,255,255,0.2); color: white; font-weight: bold; }
+#gasBtn { width: 90px !important; height: 90px !important; background: rgba(0,255,0,0.4) !important; }
